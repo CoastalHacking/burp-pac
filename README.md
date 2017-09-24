@@ -1,8 +1,6 @@
 # Burp Proxy Auto-Config Extension
 
-[![Build Status](https://travis-ci.org/CoastalHacking/burp-pac.svg?branch=develop)](https://travis-ci.org/CoastalHacking/burp-pac)
-
-[![Code Coverage](https://img.shields.io/codecov/c/github/CoastalHacking/burp-pac/develop.svg)](https://codecov.io/github/CoastalHacking/burp-pac?branch=develop)
+[![Build Status](https://travis-ci.org/CoastalHacking/burp-pac.svg?branch=develop)](https://travis-ci.org/CoastalHacking/burp-pac) [![Code Coverage](https://img.shields.io/codecov/c/github/CoastalHacking/burp-pac/develop.svg)](https://codecov.io/github/CoastalHacking/burp-pac?branch=develop)
 
 The Burp Proxy Auto-Config (PAC) [extension][burpext] automatically configures project-level
 upstream proxies for use by Burp.

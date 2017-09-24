@@ -1,6 +1,17 @@
 sudo: false
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+deploy:
+  file_glob: true
+  provider: releases
+  api_key:
+    secure: 3JIYrKxSyRPhKZq1ugX7e7+lCkAreo+DxuCPLcFP15OIbAEYHOL1pveHiQH552FyF3ySZSSix0xyyMDHY6CVodXWr2MjZF9632/Ef6M+kckz3I6w0/v3ibc5EbFxRNmeAfinE+R0gkVlh/cDyhg41hdehQDIfBN4AXo4YTOMkcN5GZ4rG6ceL6KROGybbRZOdkLTNpDpmavyv8BlE3h68VwnUKrTsCv7cThx2um3431b0WgJdhtshvaC62F25AkQHzH1s2Svwj/Gv8BR6I42G2b92h2EKgyTGOGTkTmn2mlnhNI9JPhOMNi6guIVNnLq08bdNhuLC0PoC66OQ5KHIPrw378dulx7bECQEa4EQ28U3P2oTUvHF9waXYAay1oPonC+DRjzuGsQHX0oPMRmqp04jR99X4t7Ij+LgWT949DroKfBPDjY3QbTf6haXhbmfihQHnMRemh+uH9iCJkwZnQrheYTETOBHlQ7KDYLUOItQZuHzq6+K6Vv/zsKngk7FRTMU2wX5F+jLYzOB6knYKTna0cVrKnV3TglhpHNLSf4ScGB9GDxNVbWYGo1zgSG1EWC3AcQPT0fKm33mEkIc75IYif32Gr2SveZTVz9+vAgz8Dvva3NZUOSuE/xlqM914V9Uvc+9EO+n0OZ/15hoabQkqm4y+IzXMBwOstNn3E=
+  file: "build/libs/burp-pac-*-all.jar"
+  on:
+    branch: develop
+    prerelease: true
+    overwrite: true
+    repo: CoastalHacking/burp-pac
