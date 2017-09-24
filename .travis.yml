@@ -18,6 +18,6 @@ deploy:
   file: "${RELEASE_PKG_FILE}"
   on:
     branch: develop
-    prerelease: true
+    pre-release: true
     overwrite: true
     repo: CoastalHacking/burp-pac
