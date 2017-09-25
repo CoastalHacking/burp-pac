@@ -2,8 +2,11 @@
 
 [![Build Status](https://travis-ci.org/CoastalHacking/burp-pac.svg?branch=develop)](https://travis-ci.org/CoastalHacking/burp-pac) [![Code Coverage](https://img.shields.io/codecov/c/github/CoastalHacking/burp-pac/develop.svg)](https://codecov.io/github/CoastalHacking/burp-pac?branch=develop)
 
-The Burp Proxy Auto-Config (PAC) [extension][burpext] automatically configures project-level
-upstream proxies for use by Burp.
+Are you using Burp inside a network that uses a [Proxy Auto-Config (PAC)][pac] script to dynamically determine which upstream proxies to use for some given host or hosts?
+
+Are you lazy and just want an extension to figure this out auto-magically, without any user interaction?
+
+Well then, the Burp Proxy Auto-Config (PAC) [extension][burpext] is for you! It automatically configures project-level upstream proxies for use by Burp based upon the desktop environment. It uses [proxy-vole][proxyVole], which has support for PAC scripts built-in, in addition to supporting Java properties and environmental variables.
 
 ## Comparison to Other Burp PAC Extensions
 
@@ -11,7 +14,7 @@ upstream proxies for use by Burp.
 
 Similarities:
 
-* Both extensions use a library that evaluates the JavaScript PAC file within a Rhino ScriptEngine. However, this extension uses the newer version of [proxy-vole][proxyVole]. Proxy PAC uses an older unsupported version.  
+* Both extensions use a library that evaluates the JavaScript PAC file within a Rhino ScriptEngine. However, this extension uses the newer version of proxy-vole. Proxy PAC uses an older unsupported version.  
 
 Differences:
 
@@ -30,6 +33,7 @@ This plugin assumes the following are trusted sources of proxy information:
 
 Caveat emptor: any identified PAC scripts are executed as-is. That is, they are not sandboxed within a security manager. 
 
+[pac]: https://en.wikipedia.org/wiki/Proxy_auto-config
 [burpext]: https://portswigger.net/burp/extender/
 [proxyVole]: https://github.com/MarkusBernhardt/proxy-vole
 [proxyVoleJava]: https://github.com/MarkusBernhardt/proxy-vole/blob/master/src/main/java/com/github/markusbernhardt/proxy/search/java/JavaProxySearchStrategy.java#L13
