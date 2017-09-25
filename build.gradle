@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'us.coastalhacking'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 // Apply the java-library plugin to add support for Java Library
 apply plugin: 'java-library'
