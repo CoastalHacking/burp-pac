@@ -62,7 +62,7 @@ checkstyle {
 
 dependencies {
     implementation 'com.google.code.gson:gson:2.8.1'
-    implementation 'com.github.markusbernhardt:proxy-vole:1.0.3'
+    implementation 'com.github.markusbernhardt:proxy-vole:1.0.4'
     // also pulls in transitive guava library
 	implementation 'com.google.inject:guice:4.1.0'
 	// do not package
