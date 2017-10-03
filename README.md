@@ -55,8 +55,6 @@ This plugin assumes the following are trusted sources of proxy information:
 * [Desktop proxy settings][proxyVoleOS], including any configured proxy auto-configuration scripts
 * [Certain][proxyVoleEnv] environmental variables
 
-Caveat emptor: any identified PAC scripts are executed as-is. That is, they are not sandboxed within a security manager. 
-
 [bug_13]: https://github.com/CoastalHacking/burp-pac/issues/13
 [feature_2]: https://github.com/CoastalHacking/burp-pac/issues/2
 [pacissues]: https://github.com/CoastalHacking/burp-pac/issues
