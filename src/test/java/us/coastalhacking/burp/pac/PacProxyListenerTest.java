@@ -14,6 +14,7 @@
 
 package us.coastalhacking.burp.pac;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -24,12 +25,14 @@ import static org.mockito.Mockito.when;
 
 import burp.IHttpRequestResponse;
 import burp.IInterceptedProxyMessage;
+import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import java.net.Proxy;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+import org.mockito.Mockito;
 import us.coastalhacking.burp.pac.config.Config;
 import us.coastalhacking.burp.pac.config.ConfigUtils;
 import us.coastalhacking.burp.pac.config.Server;
@@ -191,5 +194,62 @@ public class PacProxyListenerTest {
     verify(mockConfigUtils, never()).removeServersFromConfig(any(), any());
     verify(mockConfigUtils, never()).saveConfig(any());
     assertTrue(proxyListener.cache.isEmpty());
+  }
+
+  private static class SpyMockModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(Adapter.class).toInstance(mock(Adapter.class));
+      bind(ProxyUtils.class).toInstance(Mockito.spy(new ProxyUtils()));
+      bind(ConfigUtils.class).toInstance(Mockito.spy(new ConfigUtils()));
+    }
+  }
+
+  @Test
+  public void shouldUnloadExtensionWithExistingServerIntact() {
+    final String existingDestinationHost = "existing.example.com";
+    final String existingProxyHost = "localhost";
+    final int existingPort = 1100;
+
+    // create a configuration with a server
+    Server existingServer = new Server();
+    existingServer.setProxyHost(existingProxyHost);
+    existingServer.setProxyPort(existingPort);
+    existingServer.setEnabled(true);
+    existingServer.setDestinationHost(existingDestinationHost);
+
+    // mock
+    IInterceptedProxyMessage message = mock(IInterceptedProxyMessage.class);
+    IHttpRequestResponse messageInfo = mock(IHttpRequestResponse.class);
+    when(message.getMessageInfo()).thenReturn(messageInfo);
+    Injector injector = TestUtils.createInjectorWithModuleOverride(new SpyMockModule());
+    Adapter mockAdapter = injector.getInstance(Adapter.class);
+    Server newServer = TestUtils.getGeneralServer();
+    URI mockUri = mock(URI.class);
+    when(mockAdapter.toServer(any())).thenReturn(newServer);
+    when(mockAdapter.toUri(any())).thenReturn(mockUri);
+    ProxyUtils spyProxyUtils = injector.getInstance(ProxyUtils.class);
+    List<Proxy> proxies = new ArrayList<>();
+    Mockito.doReturn(proxies).when(spyProxyUtils).getProxies(any());
+    ConfigUtils spyConfigUtils = injector.getInstance(ConfigUtils.class);
+    Config realConfig = new Config();
+    spyConfigUtils.addServerToConfig(existingServer, realConfig);
+    Mockito.doReturn(realConfig).when(spyConfigUtils).getConfig(any());
+
+    // call processProxyMessage
+    PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
+    proxyListener.processProxyMessage(/* messageIsRequest */true, message);
+
+    // assert configuration
+    assertTrue(spyConfigUtils.isServerInConfig(existingServer, realConfig));
+    assertTrue(spyConfigUtils.isServerInConfig(newServer, realConfig));
+
+    // call extensionUnloaded
+    proxyListener.extensionUnloaded();
+
+    // assert configuration
+    assertTrue(spyConfigUtils.isServerInConfig(existingServer, realConfig));
+    assertFalse(spyConfigUtils.isServerInConfig(newServer, realConfig));
+
   }
 }
