@@ -6,6 +6,8 @@ script:
 - ./gradlew shadowJar
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+after_failure:
+- find build/reports/tests -type f -exec cat {} \;
 before_deploy:
 - export RELEASE_PKG_FILE=$(ls build/libs/burp-pac-*-all.jar)
 - echo "deploying ${RELEASE_PKG_FILE} to GitHub releases"
