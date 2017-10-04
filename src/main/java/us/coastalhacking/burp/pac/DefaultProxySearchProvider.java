@@ -16,11 +16,17 @@ package us.coastalhacking.burp.pac;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.ProxySearch.Strategy;
+import com.github.markusbernhardt.proxy.util.PlatformUtil;
+import com.github.markusbernhardt.proxy.util.PlatformUtil.Platform;
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class DefaultProxySearchProvider implements Provider<ProxySearch> {
 
   protected ProxySearch proxySearch;
+  
+  @Inject
+  protected PlatformUtil platformUtil;
 
   @Override
   public ProxySearch get() {
@@ -31,6 +37,10 @@ public class DefaultProxySearchProvider implements Provider<ProxySearch> {
       proxySearch.addStrategy(Strategy.JAVA);
       proxySearch.addStrategy(Strategy.OS_DEFAULT);
       proxySearch.addStrategy(Strategy.ENV_VAR);
+      Platform platform = PlatformUtil.getCurrentPlattform();
+      if (platform == Platform.WIN) {
+        proxySearch.addStrategy(Strategy.IE);
+      }
     }
     return proxySearch;
   }
