@@ -1,0 +1,12 @@
+Uuid: 7b3eae07aa724196ab85a8b64cd095d1
+ExtensionType: 1
+Name: Proxy Auto Config
+RepoName: proxy-auto-config
+ScreenVersion: 0.0.3
+SerialVersion: 1
+MinPlatformVersion: 0
+ProOnly: False
+Author: Jon Passki
+ShortDescription: Automatically configures Burp upstream proxies to match desktop proxy settings.
+EntryPoint: build/libs/burp-pac-0.0.3-all.jar
+BuildCommand: ./gradlew shadowJar
