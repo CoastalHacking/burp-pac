@@ -14,6 +14,8 @@
 
 package burp;
 
+import com.github.markusbernhardt.proxy.util.Logger;
+import com.github.markusbernhardt.proxy.util.Logger.LogBackEnd;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import us.coastalhacking.burp.pac.PacModule;
@@ -35,6 +37,9 @@ public class BurpExtender implements IBurpExtender {
   public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
 
     injector = Guice.createInjector(new PacModule(callbacks));
+    // Add logger first
+    LogBackEnd backend = injector.getInstance(LogBackEnd.class);
+    Logger.setBackend(backend);
     PacProxyListener pacProxyListener = injector.getInstance(PacProxyListener.class);
     callbacks.registerProxyListener(pacProxyListener);
     callbacks.registerExtensionStateListener(pacProxyListener);
