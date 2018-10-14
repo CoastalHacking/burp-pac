@@ -42,7 +42,8 @@ public class ProxyUtils {
    * Populate a server instance with the most appropriate proxy.
    * 
    * <p>The below code favors HTTP/S proxies over direct connections.
-   * It ignores SOCKS proxies due to Burp only supporting one SOCKS proxy at a time.
+   * It ignores SOCKS proxies due to
+   * Burp only supporting one SOCKS proxy at a time.
    * 
    * @param server a server instance
    * @param proxies a list of proxies or null
@@ -62,6 +63,7 @@ public class ProxyUtils {
           case SOCKS:
             proxy = p;
             break;
+          // Unreachable
           default:
             break;
         }
@@ -70,21 +72,30 @@ public class ProxyUtils {
 
     switch (proxy.type()) {
       case DIRECT:
+        callbacks.printOutput(String.format("No proxy / server is directly accessible."));
         break;
       case HTTP:
-        server.setEnabled(true);
         if (proxy.address() instanceof InetSocketAddress) {
           InetSocketAddress address = (InetSocketAddress) proxy.address();
           // Don't trigger a DNS lookup
+          server.setEnabled(true);
           server.setProxyHost(address.getHostString());
           server.setProxyPort(address.getPort());
+          callbacks.printOutput(String.format("Server '%s' is HTTP", server));
+        } else {
+          final String type =
+              proxy.address() == null ? "null" : proxy.address().getClass().getName();
+          callbacks.printError(String.format("Unsupported address type: %s", type));
         }
+        // log
         break;
       case SOCKS:
-        callbacks.printOutput(String.format("Server '%s' uses upstream SOCKS proxy, "
+        callbacks.printError(String.format("Server '%s' uses upstream SOCKS proxy, "
             + "however Burp can only support 1 upstream SOCKS proxy. Not adding!", server));
         break;
+      // Unreachable  
       default:
+        callbacks.printError(String.format("Unsupported proxy type: %s", proxy.type()));
         break;
     }
   }
