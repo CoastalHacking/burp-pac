@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'us.coastalhacking'
-version = '0.0.2'
+version = '0.1.0'
 
 // Apply the java-library plugin to add support for Java Library
 apply plugin: 'java-library'
@@ -50,7 +50,7 @@ configurations {
 
 def versions = [
   // http://checkstyle-addons.thomasjensen.com/checkstyle-compatibility-matrix.html
-  checkstyle: '8.2',
+  checkstyle: '8.12',
 ]
 
 checkstyle {
@@ -62,10 +62,10 @@ checkstyle {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.1'
-    implementation 'com.github.markusbernhardt:proxy-vole:1.0.4'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.github.markusbernhardt:proxy-vole:1.0.5'
     // also pulls in transitive guava library
-	implementation 'com.google.inject:guice:4.1.0'
+	implementation 'com.google.inject:guice:4.2.1'
 	// do not package
 	api 'net.portswigger.burp.extender:burp-extender-api:1.7.22'
 
