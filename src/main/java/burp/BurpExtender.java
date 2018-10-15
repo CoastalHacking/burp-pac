@@ -40,9 +40,15 @@ public class BurpExtender implements IBurpExtender {
     // Add logger first
     LogBackEnd backend = injector.getInstance(LogBackEnd.class);
     Logger.setBackend(backend);
+        
+    // Proxy vole 
     PacProxyListener pacProxyListener = injector.getInstance(PacProxyListener.class);
     callbacks.registerProxyListener(pacProxyListener);
     callbacks.registerExtensionStateListener(pacProxyListener);
+    
+    // Tab
+    ITab tab = injector.getInstance(ITab.class);
+    callbacks.addSuiteTab(tab);
     callbacks.setExtensionName(EXTENSION_NAME);
   }
 }
