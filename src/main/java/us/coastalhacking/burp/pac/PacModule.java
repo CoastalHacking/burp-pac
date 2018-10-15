@@ -15,7 +15,9 @@
 package us.coastalhacking.burp.pac;
 
 import burp.IBurpExtenderCallbacks;
+import burp.ITab;
 import com.github.markusbernhardt.proxy.ProxySearch;
+import com.github.markusbernhardt.proxy.util.Logger.LogBackEnd;
 import com.google.inject.AbstractModule;
 import java.net.ProxySelector;
 import us.coastalhacking.burp.pac.config.ConfigUtils;
@@ -41,6 +43,10 @@ public class PacModule extends AbstractModule {
   protected void configure() {
 
     bind(IBurpExtenderCallbacks.class).toInstance(this.callbacks);
+
+    bind(ITab.class).to(ProxyTesterTab.class);
+    
+    bind(LogBackEnd.class).to(CallbackLogBackend.class);
 
     bind(ProxySearch.class).toProvider(DefaultProxySearchProvider.class);
 

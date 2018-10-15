@@ -1,6 +1,6 @@
 # Burp Proxy Auto-Config Extension
 
-[![Build Status](https://travis-ci.org/CoastalHacking/burp-pac.svg?branch=master)](https://travis-ci.org/CoastalHacking/burp-pac) [![Code Coverage](https://img.shields.io/codecov/c/github/CoastalHacking/burp-pac/develop.svg)](https://codecov.io/github/CoastalHacking/burp-pac?branch=master)
+[![Build Status](https://travis-ci.org/CoastalHacking/burp-pac.svg?branch=master)](https://travis-ci.org/CoastalHacking/burp-pac) [![Code Coverage](https://img.shields.io/codecov/c/github/CoastalHacking/burp-pac/master.svg)](https://codecov.io/github/CoastalHacking/burp-pac?branch=master)
 
 Are you using Burp inside a network that uses a [Proxy Auto-Config (PAC)][pac] script to dynamically determine which upstream proxies to use for some given host or hosts?
 

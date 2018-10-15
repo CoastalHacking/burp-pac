@@ -1,6 +1,6 @@
 package us.coastalhacking.burp.pac;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.search.browser.ie.IEProxySearchStrategy;
