@@ -50,8 +50,7 @@ public class ConfigUtilsTest {
     b.setDestinationHost("a.b.b");
     assertNotEquals(a, b);
   }
-
-
+  
   @Test
   public void shouldNotMatchServersNullOther() {
     Server a = new Server();
@@ -82,6 +81,60 @@ public class ConfigUtilsTest {
     assertNotEquals(a, b);
   }
 
+  
+  @Test
+  public void shouldNotMatchServerProxyHost() {
+    Server a = new Server();
+    Server b = new Server();
+    a.setProxyHost("1.2.3.4");
+    assertNotEquals(a, b);     
+  }
+  
+  @Test
+  public void shouldMatchServerProxyHost() {
+    Server a = new Server();
+    Server b = new Server();
+    String proxyHost = "a.b.c";
+    a.setProxyHost(proxyHost);
+    b.setProxyHost(proxyHost);
+    assertEquals(a, b);
+  }
+
+  @Test
+  public void shouldNotMatchServerProxyPort() {
+    Server a = new Server();
+    Server b = new Server();
+    a.setProxyPort(8080);
+    assertNotEquals(a, b);     
+  }
+  
+  @Test
+  public void shouldMatchServerProxyPort() {
+    Server a = new Server();
+    Server b = new Server();
+    int proxyPort = 8080;
+    a.setProxyPort(proxyPort);
+    b.setProxyPort(proxyPort);
+    assertEquals(a, b);
+  }
+
+  @Test
+  public void shouldNotMatchServerEnabled() {
+    Server a = new Server();
+    Server b = new Server();
+    a.setEnabled(true);
+    assertNotEquals(a, b);     
+  }
+  
+  @Test
+  public void shouldMatchServerEnabled() {
+    Server a = new Server();
+    Server b = new Server();
+    a.setEnabled(true);
+    b.setEnabled(true);
+    assertEquals(a, b);
+  }
+  
   @Test
   public void shouldDeserializeConfigWithServer() {
 

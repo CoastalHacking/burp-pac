@@ -100,9 +100,7 @@ public class Server {
     this.domainHostname = domainHostname;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -110,12 +108,13 @@ public class Server {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((destinationHost == null) ? 0 : destinationHost.hashCode());
+    result = prime * result + (enabled ? 1231 : 1237);
+    result = prime * result + ((proxyHost == null) ? 0 : proxyHost.hashCode());
+    result = prime * result + proxyPort;
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -135,6 +134,19 @@ public class Server {
         return false;
       }
     } else if (!destinationHost.equals(other.destinationHost)) {
+      return false;
+    }
+    if (enabled != other.enabled) {
+      return false;
+    }
+    if (proxyHost == null) {
+      if (other.proxyHost != null) {
+        return false;
+      }
+    } else if (!proxyHost.equals(other.proxyHost)) {
+      return false;
+    }
+    if (proxyPort != other.proxyPort) {
       return false;
     }
     return true;
