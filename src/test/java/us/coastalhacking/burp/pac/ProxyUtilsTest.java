@@ -15,7 +15,6 @@
 package us.coastalhacking.burp.pac;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -96,21 +95,6 @@ public class ProxyUtilsTest {
   }
 
   @Test
-  public void shouldHaveProxy() {
-    Server server = new Server();
-    server.setProxyHost("joshua");
-    ProxyUtils proxyUtils = new ProxyUtils();
-    assertTrue(proxyUtils.hasProxy(server));
-  }
-
-  @Test
-  public void shouldNotHaveProxy() {
-    Server server = new Server();
-    ProxyUtils proxyUtils = new ProxyUtils();
-    assertFalse(proxyUtils.hasProxy(server));
-  }
-
-  @Test
   public void shouldGetExpectedHttpProxyHost() throws Exception {
     String expectedProxyHost = "joshua";
     System.setProperty(HTTP_PROXY_HOST, expectedProxyHost);
@@ -179,7 +163,7 @@ public class ProxyUtilsTest {
     int unexpectedPort = 2364;
     proxies.add(mockProxy(unexpectedType, unexpectedHostString, unexpectedPort));
     proxyUtils.populateProxyForServer(server, proxies);
-    assertFalse(proxyUtils.hasProxy(server));
+    assertTrue(Strings.isNullOrEmpty(server.getProxyHost()));
 
   }
 
@@ -194,7 +178,7 @@ public class ProxyUtilsTest {
     int unexpectedPort = 2364;
     proxies.add(mockProxy(unexpectedType, unexpectedHostString, unexpectedPort));
     proxyUtils.populateProxyForServer(server, proxies);
-    assertFalse(proxyUtils.hasProxy(server));
+    assertTrue(Strings.isNullOrEmpty(server.getProxyHost()));
   }
 
   @Test

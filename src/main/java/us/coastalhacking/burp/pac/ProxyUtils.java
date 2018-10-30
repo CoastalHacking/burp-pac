@@ -15,7 +15,6 @@
 package us.coastalhacking.burp.pac;
 
 import burp.IBurpExtenderCallbacks;
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.net.InetSocketAddress;
@@ -98,9 +97,5 @@ public class ProxyUtils {
         callbacks.printError(String.format("Unsupported proxy type: %s", proxy.type()));
         break;
     }
-  }
-
-  public boolean hasProxy(Server server) {
-    return !Strings.isNullOrEmpty(server.getProxyHost());
   }
 }

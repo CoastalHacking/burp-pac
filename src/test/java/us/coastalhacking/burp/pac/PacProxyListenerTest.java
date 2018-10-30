@@ -17,20 +17,25 @@ package us.coastalhacking.burp.pac;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import burp.IBurpExtenderCallbacks;
 import burp.IHttpRequestResponse;
 import burp.IInterceptedProxyMessage;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Test;
 import org.mockito.Mockito;
 import us.coastalhacking.burp.pac.config.Config;
@@ -54,7 +59,6 @@ public class PacProxyListenerTest {
     ProxyUtils mockProxyUtils = injector.getInstance(ProxyUtils.class);
     List<Proxy> proxies = new ArrayList<>();
     when(mockProxyUtils.getProxies(any())).thenReturn(proxies);
-    when(mockProxyUtils.hasProxy(any())).thenReturn(true);
     ConfigUtils mockConfigUtils = injector.getInstance(ConfigUtils.class);
     Config config = new Config();
     when(mockConfigUtils.getConfig(any())).thenReturn(config);
@@ -98,7 +102,6 @@ public class PacProxyListenerTest {
     ProxyUtils mockProxyUtils = injector.getInstance(ProxyUtils.class);
     List<Proxy> proxies = new ArrayList<>();
     when(mockProxyUtils.getProxies(any())).thenReturn(proxies);
-    when(mockProxyUtils.hasProxy(any())).thenReturn(false);
 
     // First call
     PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
@@ -108,37 +111,33 @@ public class PacProxyListenerTest {
     proxyListener.processProxyMessage(/* messageIsRequest */true, message);
 
     // Verify methods are called the correct number of times
-    verify(mockAdapter, times(1)).toUri(any());
-    verify(mockProxyUtils, times(1)).hasProxy(any());
+    verify(mockAdapter, times(2)).toUri(any());
   }
 
   @Test
-  public void shouldProcessProxyMessageNotAddToConfig() {
+  public void shouldProcessNotAddToConfig() {
     // Mock
-    IInterceptedProxyMessage message = mock(IInterceptedProxyMessage.class);
-    IHttpRequestResponse messageInfo = mock(IHttpRequestResponse.class);
-    when(message.getMessageInfo()).thenReturn(messageInfo);
     Injector injector = TestUtils.createInjectorWithModuleOverride(new TestUtils.MockPacModule());
-    Adapter mockAdapter = injector.getInstance(Adapter.class);
-    Server server = TestUtils.getGeneralServer();
-    URI mockUri = mock(URI.class);
-    when(mockAdapter.toServer(any())).thenReturn(server);
-    when(mockAdapter.toUri(any())).thenReturn(mockUri);
+    Server realServer = TestUtils.getGeneralServer();
+    Server key = new Server();
+    key.setDestinationHost(realServer.getDestinationHost());
     ProxyUtils mockProxyUtils = injector.getInstance(ProxyUtils.class);
     List<Proxy> proxies = new ArrayList<>();
     when(mockProxyUtils.getProxies(any())).thenReturn(proxies);
-    when(mockProxyUtils.hasProxy(any())).thenReturn(true);
     ConfigUtils mockConfigUtils = injector.getInstance(ConfigUtils.class);
     Config config = new Config();
     when(mockConfigUtils.getConfig(any())).thenReturn(config);
     when(mockConfigUtils.isServerInConfig(any(), any())).thenReturn(true);
+    IBurpExtenderCallbacks callbacks = mock(IBurpExtenderCallbacks.class);
+    Map<Server, Server> cache = new HashMap<>();
+    cache.put(key, realServer);
 
     // Call
     PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
-    proxyListener.processProxyMessage(/* messageIsRequest */true, message);
+    proxyListener.process(key, realServer, cache, mockConfigUtils, callbacks);
 
     // Verify methods not called
-    verify(mockConfigUtils, never()).addServerToConfig(server, config);
+    verify(mockConfigUtils, never()).addServerToConfig(realServer, config);
     verify(mockConfigUtils, never()).saveConfig(config);
   }
 
@@ -150,15 +149,13 @@ public class PacProxyListenerTest {
     when(message.getMessageInfo()).thenReturn(messageInfo);
     Injector injector = TestUtils.createInjectorWithModuleOverride(new TestUtils.MockPacModule());
 
-    ProxyUtils mockProxyUtils = injector.getInstance(ProxyUtils.class);
-    when(mockProxyUtils.hasProxy(any())).thenReturn(true);
     ConfigUtils mockConfigUtils = injector.getInstance(ConfigUtils.class);
     Config config = new Config();
     when(mockConfigUtils.getConfig(any())).thenReturn(config);
     Server server = TestUtils.getGeneralServer();
     PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
     // ignore locking
-    proxyListener.cache.put(server, new Object());
+    proxyListener.cache.put(server, server);
 
     // Call
     proxyListener.extensionUnloaded();
@@ -177,15 +174,15 @@ public class PacProxyListenerTest {
     when(message.getMessageInfo()).thenReturn(messageInfo);
     Injector injector = TestUtils.createInjectorWithModuleOverride(new TestUtils.MockPacModule());
 
-    ProxyUtils mockProxyUtils = injector.getInstance(ProxyUtils.class);
-    when(mockProxyUtils.hasProxy(any())).thenReturn(false);
     ConfigUtils mockConfigUtils = injector.getInstance(ConfigUtils.class);
     Config config = new Config();
     when(mockConfigUtils.getConfig(any())).thenReturn(config);
     Server server = TestUtils.getGeneralServer();
+    Server key = new Server();
+    key.setDestinationHost(server.getDestinationHost());
     PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
     // ignore locking
-    proxyListener.cache.put(server, new Object());
+    proxyListener.cache.put(key, server);
 
     // Call
     proxyListener.extensionUnloaded();
@@ -251,5 +248,50 @@ public class PacProxyListenerTest {
     assertTrue(spyConfigUtils.isServerInConfig(existingServer, realConfig));
     assertFalse(spyConfigUtils.isServerInConfig(newServer, realConfig));
 
+  }
+
+  @Test
+  public void shouldRemoveServerWithProxyNoAdd() {
+    // Mock
+    Injector injector = TestUtils.createInjectorWithModuleOverride(new TestUtils.MockPacModule());
+    Server oldValue = TestUtils.getGeneralServer();
+    Map<Server, Server> cache = new HashMap<>();
+    Server key = new Server();
+    key.setDestinationHost(oldValue.getDestinationHost());
+    cache.put(key, oldValue);
+    ConfigUtils mockConfigUtils = injector.getInstance(ConfigUtils.class);
+    Config config = new Config();
+    when(mockConfigUtils.getConfig(any())).thenReturn(config);
+    when(mockConfigUtils.isServerInConfig(eq(oldValue), eq(config))).thenReturn(true);
+    Server newServer = new Server();
+    newServer.setDestinationHost(key.getDestinationHost());
+    when(mockConfigUtils.isServerInConfig(eq(newServer), eq(config))).thenReturn(false);
+    IBurpExtenderCallbacks callbacks = mock(IBurpExtenderCallbacks.class);
+
+    // Call
+    assertTrue(cache.containsValue(oldValue));
+    PacProxyListener proxyListener = injector.getInstance(PacProxyListener.class);
+    proxyListener.process(key, newServer, cache, mockConfigUtils, callbacks);
+
+    // Verify
+    verify(mockConfigUtils, times(1)).removeServersFromConfig(any(), any());
+    assertFalse(cache.containsValue(oldValue));
+    verify(mockConfigUtils, times(1)).saveConfig(any());
+    // Second time no proxy server
+    verify(mockConfigUtils, times(0)).addServerToConfig(any(), any());
+
+  }
+
+  Proxy mockProxy(Proxy.Type type, String proxyHost, int proxyPort) {
+    Proxy proxy = mock(Proxy.class);
+    when(proxy.type()).thenReturn(type);
+
+    if (type == Proxy.Type.HTTP) {
+      InetSocketAddress mockAddress = mock(InetSocketAddress.class);
+      when(mockAddress.getHostString()).thenReturn(proxyHost);
+      when(mockAddress.getPort()).thenReturn(proxyPort);
+      when(proxy.address()).thenReturn(mockAddress);
+    }
+    return proxy;
   }
 }
